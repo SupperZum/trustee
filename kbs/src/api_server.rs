@@ -52,6 +52,9 @@ macro_rules! kbs_path {
 pub struct ApiServer {
     plugin_manager: PluginManager,
 
+    #[cfg(feature = "launch-http")]
+    launch_proof_service: Option<web::Data<crate::launch_http::LaunchHttpService>>,
+
     #[cfg(feature = "as")]
     attestation_service: crate::attestation::AttestationService,
 
@@ -134,9 +137,23 @@ impl ApiServer {
             admin,
             token_verifier,
 
+            #[cfg(feature = "launch-http")]
+            launch_proof_service: None,
+
             #[cfg(feature = "as")]
             attestation_service,
         })
+    }
+
+    /// Share an explicitly constructed launch service across all HTTP workers.
+    /// The ordinary constructor leaves this protocol disabled.
+    #[cfg(feature = "launch-http")]
+    pub fn with_launch_proof_service(
+        mut self,
+        service: crate::launch_http::LaunchHttpService,
+    ) -> Self {
+        self.launch_proof_service = Some(web::Data::new(service));
+        self
     }
 
     /// Start the HTTP server and serve API requests.
@@ -165,26 +182,35 @@ impl ApiServer {
         let mut http_server = HttpServer::new({
             move || {
                 let api_server = self.clone();
-                App::new()
+                #[cfg(feature = "launch-http")]
+                let launch_proof_service = api_server.launch_proof_service.clone();
+                let app = App::new()
                     .wrap(middleware::Logger::default())
                     .wrap(middleware::from_fn(prometheus_metrics_middleware))
                     .app_data(web::Data::new(api_server))
                     .app_data(web::PayloadConfig::new(
                         (1024 * 1024 * http_config.payload_request_size) as usize,
-                    ))
-                    .service(
-                        web::resource([kbs_path!("{path:.*}")])
-                            .route(web::get().to(api))
-                            .route(web::post().to(api))
-                            .route(web::put().to(api))
-                            .route(web::delete().to(api)),
-                    )
-                    .service(
-                        web::resource("/metrics")
-                            .route(web::get().to(prometheus_metrics_handler))
-                            .route(web::post().to(|| HttpResponse::MethodNotAllowed())),
-                    )
-                    .route("/healthz", web::get().to(HttpResponse::Ok))
+                    ));
+                #[cfg(feature = "launch-http")]
+                let app = app.configure(move |cfg| {
+                    if let Some(service) = launch_proof_service {
+                        cfg.app_data(service);
+                        crate::launch_http::configure(cfg);
+                    }
+                });
+                app.service(
+                    web::resource([kbs_path!("{path:.*}")])
+                        .route(web::get().to(api))
+                        .route(web::post().to(api))
+                        .route(web::put().to(api))
+                        .route(web::delete().to(api)),
+                )
+                .service(
+                    web::resource("/metrics")
+                        .route(web::get().to(prometheus_metrics_handler))
+                        .route(web::post().to(|| HttpResponse::MethodNotAllowed())),
+                )
+                .route("/healthz", web::get().to(HttpResponse::Ok))
             }
         });
 

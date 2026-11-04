@@ -9,6 +9,13 @@ edition.workspace = true
 [features]
 default = ["coco-as-builtin", "coco-as-grpc", "intel-trust-authority-as"]
 
+# Resource-policy evaluation capture without launch/session transport.
+launch-policy-capture = ["policy-engine/evaluation-capture"]
+# Ephemeral launch sessions, independent of the legacy cookie/token path.
+launch-session = ["launch-policy-capture", "attestation-service/launch-session", "dep:execution-proof-contract", "dep:ring", "dep:serde_json_canonicalizer"]
+launch-http = ["launch-session"]
+launch-credentials = ["launch-http"]
+
 # Support a backend attestation service for KBS
 as = []
 
@@ -64,6 +71,9 @@ aes = { version = "0.8", features = ["zeroize"] }
 polyval = { version = "0.6", features = ["zeroize"] }
 aes-kw = { version = "0.3.1", features = ["zeroize"] }
 anyhow.workspace = true
+execution-proof-contract = { path = "../../execution-proof-prototype/contract", optional = true }
+ring = { version = "=0.17.14", optional = true }
+serde_json_canonicalizer = { version = "=0.3.2", optional = true }
 async-trait.workspace = true
 backon = { version = "1.6", optional = true }
 base64.workspace = true
