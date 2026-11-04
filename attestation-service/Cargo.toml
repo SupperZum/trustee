@@ -5,6 +5,10 @@ edition = "2021"
 
 [features]
 default = ["grpc-bin", "rvps-grpc"]
+# Policy evaluation capture without a launch appraisal endpoint.
+launch-policy-capture = ["policy-engine/evaluation-capture"]
+# TDX-only quote/session binding without an HTTP endpoint.
+launch-session = ["launch-policy-capture", "dep:execution-proof-contract"]
 all-verifier = ["verifier/all-verifier"]
 tdx-verifier = ["verifier/tdx-verifier"]
 sgx-verifier = ["verifier/sgx-verifier"]
@@ -48,6 +52,7 @@ axum = { version = "0.8", default-features = false, features = [
     "json",
 ], optional = true }
 anyhow.workspace = true
+execution-proof-contract = { path = "../../execution-proof-prototype/contract", optional = true }
 async-trait.workspace = true
 base64.workspace = true
 serde_json_canonicalizer = "0.3"
@@ -93,6 +98,7 @@ shadow-rs.workspace = true
 tonic-prost-build.workspace = true
 
 [dev-dependencies]
+ring = "=0.17.14"
 assert-json-diff.workspace = true
 hex.workspace = true
 rstest.workspace = true
