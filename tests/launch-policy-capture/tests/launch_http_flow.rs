@@ -1040,7 +1040,7 @@ mod aggregate_guest_bridge {
     };
     use execution_proof_handoff::admission::{
         AdmissionCheck, GateStatus, GuestAdmissionConfig, GuestAdmissionError, GuestAdmissionGate,
-        GuestClock, GuestClockError, GuestUnsupportedReason,
+        GuestUnsupportedReason,
     };
     use execution_proof_issuer::{
         AdmissionPublicationKind, ClockError, IssuerClock, IssuerConfig, PolicyAdmissionConfig,
@@ -1060,14 +1060,6 @@ mod aggregate_guest_bridge {
             self.0.now_unix_seconds().map_err(|error| match error {
                 ClockError::Unavailable => launch_session::SessionError::ClockUnavailable,
                 ClockError::OutOfRange => launch_session::SessionError::ClockOutOfRange,
-            })
-        }
-    }
-    impl GuestClock for ClockAdapter {
-        fn now_unix_seconds(&self) -> Result<u64, GuestClockError> {
-            self.0.now_unix_seconds().map_err(|error| match error {
-                ClockError::Unavailable => GuestClockError::Unavailable,
-                ClockError::OutOfRange => GuestClockError::OutOfRange,
             })
         }
     }
@@ -1349,17 +1341,14 @@ mod aggregate_guest_bridge {
         let aggregate =
             verify_policy_aggregate(&aggregate_wire, &grant, &aggregate_roots()).unwrap();
         let admission_policy = issuer.admission_policy_sha384().unwrap().to_owned();
-        let gate = GuestAdmissionGate::new(
-            GuestAdmissionConfig {
-                grant: grant_expectations(&base, fixture.authority.public()),
-                expected_grant: raw.statement,
-                aggregate: aggregate_roots(),
-                audience: receipt_audience.into(),
-                issuer: base.authority,
-                admission_policy_sha384: admission_policy.clone(),
-            },
-            clock,
-        )
+        let gate = GuestAdmissionGate::new(GuestAdmissionConfig {
+            grant: grant_expectations(&base, fixture.authority.public()),
+            expected_grant: raw.statement,
+            aggregate: aggregate_roots(),
+            audience: receipt_audience.into(),
+            issuer: base.authority,
+            admission_policy_sha384: admission_policy.clone(),
+        })
         .unwrap();
         issuer
             .pin_policy_admission(
