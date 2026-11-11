@@ -25,6 +25,14 @@ pub mod admin;
 pub mod http;
 pub mod jwe;
 
+#[cfg(feature = "launch-gcp-credentials")]
+pub mod gcp_launch_credential;
+#[cfg(feature = "launch-gcp-credentials")]
+pub mod gcp_launch_http;
+#[cfg(feature = "launch-gcp-credentials")]
+pub mod gcp_launch_resource;
+#[cfg(feature = "launch-gcp-credentials")]
+pub mod gcp_launch_session;
 #[cfg(feature = "launch-credentials")]
 pub mod launch_credential;
 #[cfg(feature = "launch-http")]

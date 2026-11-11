@@ -629,6 +629,7 @@ dependencies = [
  "clap",
  "ear",
  "execution-proof-contract",
+ "execution-proof-verifier",
  "hex",
  "jsonwebtoken",
  "kbs-types",
@@ -2804,6 +2805,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "execution-proof-client"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "execution-proof-contract",
+ "kbs-types",
+ "ring",
+ "serde",
+ "serde_json",
+ "serde_json_canonicalizer",
+]
+
+[[package]]
 name = "execution-proof-contract"
 version = "0.1.0"
 dependencies = [
@@ -4350,7 +4364,9 @@ dependencies = [
  "const_format",
  "cryptoki",
  "educe",
+ "execution-proof-client",
  "execution-proof-contract",
+ "execution-proof-verifier",
  "google-cloud-secretmanager-v1",
  "hex",
  "josekit",

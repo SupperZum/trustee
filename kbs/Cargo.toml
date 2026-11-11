@@ -15,6 +15,8 @@ launch-policy-capture = ["policy-engine/evaluation-capture"]
 launch-session = ["launch-policy-capture", "attestation-service/launch-session", "dep:execution-proof-contract", "dep:ring", "dep:serde_json_canonicalizer"]
 launch-http = ["launch-session"]
 launch-credentials = ["launch-http"]
+# Explicit GCP v2 service builders; routes are never enabled by default.
+launch-gcp-credentials = ["launch-policy-capture", "attestation-service/launch-gcp-session", "dep:execution-proof-contract", "dep:execution-proof-verifier", "dep:execution-proof-client", "dep:ring", "dep:serde_json_canonicalizer"]
 
 # Support a backend attestation service for KBS
 as = []
@@ -72,6 +74,8 @@ polyval = { version = "0.6", features = ["zeroize"] }
 aes-kw = { version = "0.3.1", features = ["zeroize"] }
 anyhow.workspace = true
 execution-proof-contract = { path = "../../execution-proof-prototype/contract", optional = true }
+execution-proof-verifier = { path = "../../execution-proof-prototype/verifier", optional = true }
+execution-proof-client = { path = "../../execution-proof-prototype/client", optional = true }
 ring = { version = "=0.17.14", optional = true }
 serde_json_canonicalizer = { version = "=0.3.2", optional = true }
 async-trait.workspace = true

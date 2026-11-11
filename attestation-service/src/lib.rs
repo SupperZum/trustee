@@ -6,6 +6,8 @@
 
 pub mod config;
 pub mod ear_token;
+#[cfg(feature = "launch-gcp-session")]
+pub mod gcp_launch_evidence;
 #[cfg(feature = "launch-session")]
 pub mod launch_evidence;
 #[cfg(feature = "launch-policy-capture")]
