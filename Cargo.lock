@@ -2813,6 +2813,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "execution-proof-handoff"
+version = "0.1.0"
+dependencies = [
+ "execution-proof-contract",
+ "libc",
+ "ring",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "execution-proof-verifier"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "execution-proof-contract",
+ "execution-proof-handoff",
+ "libc",
+ "ring",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "fastrand"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -8449,6 +8473,7 @@ dependencies = [
  "csv-rs",
  "ear",
  "eventlog",
+ "execution-proof-verifier",
  "hex",
  "http-cache-reqwest",
  "intel-tee-quote-verification-rs",
@@ -8469,6 +8494,7 @@ dependencies = [
  "sev 7.1.0",
  "sha2 0.11.0",
  "strum 0.28.0",
+ "tempfile",
  "thiserror 2.0.18",
  "time",
  "tokio",

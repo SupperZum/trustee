@@ -10,10 +10,11 @@ path = "../../../deps/verifier/src/lib.rs"
 
 [features]
 default = []
+execution-quote-worker = ["dep:execution-proof-verifier", "dep:tempfile", "dep:thiserror"]
 
 # Recognize the upstream feature names; this harness enables none of them.
 [lints.rust]
-unexpected_cfgs = { level = "warn", check-cfg = ['cfg(feature, values("az-snp-vtpm-verifier", "az-tdx-vtpm-verifier", "snp-verifier", "tdx-verifier", "sgx-verifier", "csv-verifier", "hygon-dcu-verifier", "cca-verifier", "se-verifier", "nvidia-verifier", "tpm-verifier"))'] }
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(feature, values("az-snp-vtpm-verifier", "az-tdx-vtpm-verifier", "snp-verifier", "tdx-verifier", "sgx-verifier", "csv-verifier", "hygon-dcu-verifier", "cca-verifier", "se-verifier", "nvidia-verifier", "tpm-verifier", "execution-quote-worker-tdx"))'] }
 
 # Allow double_must_use from the imported async_trait expansion in this
 # test package without changing the production verifier lint policy.
@@ -21,6 +22,9 @@ unexpected_cfgs = { level = "warn", check-cfg = ['cfg(feature, values("az-snp-vt
 double_must_use = "allow"
 
 [dependencies]
+execution-proof-verifier = { path = "../../../../execution-proof-prototype/verifier", optional = true }
+tempfile = { version = "=3.27.0", optional = true }
+thiserror = { version = "=2.0.18", optional = true }
 anyhow = "=1.0.103"
 async-trait = "=0.1.89"
 base64 = "=0.22.1"
@@ -32,3 +36,9 @@ serde = { version = "=1.0.228", features = ["derive"] }
 serde_json = "=1.0.150"
 sha2 = "=0.11.0"
 tracing = "=0.1.44"
+
+[[bin]]
+name = "tdx-execution-verifier"
+path = "../../../deps/verifier/src/bin/tdx-execution-verifier.rs"
+required-features = ["execution-quote-worker"]
+test = false
