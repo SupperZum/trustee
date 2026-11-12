@@ -51,16 +51,9 @@ feature-on and feature-off modes. All markers are public synthetic fixtures.
 
 ## Dependency and integration requirements
 
-Keep the checked-in lockfile for `--locked --offline` operation. It describes a
-Memory+SQLite test graph and is not equivalent to the complete Trustee server
-graph. Storage default features are disabled only in this test workspace to
-avoid the native SQLite links conflict between sqlx 0.8.6 and rusqlite 0.41.1;
-product storage manifests and defaults are unchanged.
-
-Test-only resolution differs from the parent lockfile through `rstest`:
-`futures-timer 3.0.3` (parent 3.0.4), `toml_parser 1.1.3+spec-1.1.0`
-(parent 1.1.2+spec-1.1.0), and `winnow 1.0.2` (parent 1.0.3). The selected graph
-retains `spin 0.10.0`; fresh lock generation can select a different graph.
+Use the checked-in lockfile for `--locked --offline` operation. The harness
+disables storage default features to avoid linking SQLite through both
+`sqlx` and `rusqlite`.
 
 Product manifests use `execution-proof-prototype/contract` as an optional
 sibling path dependency. Preserve that layout when packaging, or provide the
