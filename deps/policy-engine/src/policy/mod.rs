@@ -9,6 +9,9 @@ use serde_json::Value;
 
 pub mod rego;
 
+#[cfg(feature = "evaluation-capture")]
+pub mod capture;
+
 #[derive(Debug, Clone, Deserialize, Default, PartialEq)]
 #[serde(default)]
 pub struct EvaluationResult {

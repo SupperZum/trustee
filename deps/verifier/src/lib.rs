@@ -11,6 +11,18 @@ use tracing::debug;
 pub mod sample;
 pub mod sample_device;
 
+#[cfg(feature = "execution-quote-worker")]
+pub mod execution_quote_worker;
+
+#[cfg(feature = "execution-quote-worker")]
+pub mod gcp_execution_quote_worker;
+
+#[cfg(feature = "execution-quote-worker")]
+pub mod gcp_pregrant_worker;
+
+#[cfg(feature = "execution-quote-worker")]
+pub mod gcp_bootstrap_history_worker;
+
 #[cfg(feature = "az-snp-vtpm-verifier")]
 pub mod az_snp_vtpm;
 

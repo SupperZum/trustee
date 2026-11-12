@@ -5,6 +5,8 @@ edition = "2021"
 
 [features]
 default = ["all-verifier"]
+execution-quote-worker = ["dep:execution-proof-verifier", "dep:tempfile"]
+execution-quote-worker-tdx = ["execution-quote-worker", "tdx-verifier"]
 all-verifier = [
     "tdx-verifier",
     "sgx-verifier",
@@ -58,6 +60,8 @@ nvidia-verifier = ["jsonwebtoken", "asn1-rs", "openssl", "x509-parser"]
 tpm-verifier = ["az-cvm-vtpm", "openssl", "tss-esapi"]
 
 [dependencies]
+execution-proof-verifier = { path = "../../../execution-proof-prototype/verifier", optional = true }
+tempfile = { workspace = true, optional = true }
 anyhow.workspace = true
 thiserror.workspace = true
 asn1-rs = { version = "0.7.2", optional = true }
@@ -132,3 +136,27 @@ rstest.workspace = true
 serial_test.workspace = true
 tokio.workspace = true
 tracing-subscriber.workspace = true
+
+[[bin]]
+name = "tdx-execution-verifier"
+path = "src/bin/tdx-execution-verifier.rs"
+required-features = ["execution-quote-worker"]
+test = false
+
+[[bin]]
+name = "gcp-tdx-hardware-verifier"
+path = "src/bin/gcp-tdx-hardware-verifier.rs"
+required-features = ["execution-quote-worker"]
+test = false
+
+[[bin]]
+name = "gcp-tdx-pregrant-verifier"
+path = "src/bin/gcp-tdx-pregrant-verifier.rs"
+required-features = ["execution-quote-worker"]
+test = false
+
+[[bin]]
+name = "gcp-tdx-bootstrap-history-verifier"
+path = "src/bin/gcp_tdx_bootstrap_history_verifier.rs"
+required-features = ["execution-quote-worker"]
+test = false

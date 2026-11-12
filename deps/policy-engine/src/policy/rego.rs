@@ -45,7 +45,38 @@ impl Regorus {
         eval_rules: Vec<&str>,
         extensions: Vec<RegorusExtension>,
     ) -> Result<EvaluationResult> {
+        self.evaluate_inner(data, input, policy, eval_rules, extensions, false)
+            .await
+    }
+
+    #[cfg(feature = "evaluation-capture")]
+    pub(super) async fn evaluate_captured(
+        &self,
+        data: Option<&str>,
+        input: &str,
+        policy: &str,
+        eval_rules: Vec<&str>,
+    ) -> Result<EvaluationResult> {
+        self.evaluate_inner(data, input, policy, eval_rules, vec![], true)
+            .await
+    }
+
+    async fn evaluate_inner(
+        &self,
+        data: Option<&str>,
+        input: &str,
+        policy: &str,
+        eval_rules: Vec<&str>,
+        extensions: Vec<RegorusExtension>,
+        suppress_prints: bool,
+    ) -> Result<EvaluationResult> {
         let mut engine = regorus::Engine::new();
+        if suppress_prints {
+            // A policy may print confidential input/data on success or failure.
+            // Keep those messages inside this engine and discard them on drop;
+            // they are neither emitted nor included in capture receipts/errors.
+            engine.set_gather_prints(true);
+        }
 
         let policy_hash = {
             use sha2::Digest;

@@ -1,0 +1,58 @@
+[package]
+name = "onb17-trustee-policy-capture-checks"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.93"
+publish = false
+
+# Isolate these source tests from optional TEE/Git backends.
+[workspace]
+members = ["verifier-leaf", "jwe-leaf"]
+
+[lib]
+name = "policy_engine"
+path = "../../deps/policy-engine/src/lib.rs"
+
+[features]
+default = []
+evaluation-capture = []
+capture = ["evaluation-capture"]
+launch-session = ["capture", "dep:execution-proof-contract", "dep:verifier", "dep:kbs-types", "dep:serde_json_canonicalizer", "dep:ring"]
+launch-http = ["launch-session", "dep:actix-web", "dep:execution-proof-client", "dep:execution-proof-issuer", "dep:execution-proof-handoff"]
+launch-credentials = ["launch-http", "dep:credential-jwe", "dep:rsa", "dep:openssl", "dep:prometheus", "dep:zeroize", "dep:regex"]
+
+[dependencies]
+actix-web = { version = "=4.14.0", default-features = false, features = ["macros"], optional = true }
+key-value-storage = { path = "../../deps/key-value-storage", default-features = false }
+anyhow = "=1.0.103"
+async-trait = "=0.1.89"
+base64 = "=0.22.1"
+hex = "=0.4.3"
+regorus = { version = "=0.10.1", default-features = false, features = ["regex", "base64", "time", "std"] }
+serde_json = "=1.0.150"
+serde = { version = "=1.0.228", features = ["derive"] }
+sha2 = "=0.11.0"
+thiserror = "=2.0.18"
+tokio = { version = "=1.52.3", features = ["rt-multi-thread", "macros"] }
+tracing = "=0.1.44"
+execution-proof-contract = { path = "../../../execution-proof-prototype/contract", optional = true }
+execution-proof-client = { path = "../../../execution-proof-prototype/client", optional = true }
+execution-proof-issuer = { path = "../../../execution-proof-prototype/issuer", optional = true }
+execution-proof-handoff = { path = "../../../execution-proof-prototype/handoff", optional = true }
+verifier = { package = "onb17-verifier-source-checks", path = "verifier-leaf", optional = true }
+kbs-types = { version = "=0.15.0", optional = true }
+serde_json_canonicalizer = { version = "=0.3.2", optional = true }
+ring = { version = "=0.17.14", optional = true }
+credential-jwe = { package = "onb17-jwe-source-checks", path = "jwe-leaf", optional = true }
+rsa = { version = "=0.9.10", features = ["sha2"], optional = true }
+openssl = { version = "=0.10.81", optional = true }
+prometheus = { version = "=0.14.0", optional = true }
+zeroize = { version = "=1.9.0", optional = true }
+regex = { version = "=1.13.0", optional = true }
+
+# Recognize ResourceStorage provider gates without enabling those backends.
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(feature, values("aliyun", "aws", "gcp", "vault"))'] }
+
+[dev-dependencies]
+rstest = "=0.26.1"
